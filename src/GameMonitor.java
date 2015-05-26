@@ -4,10 +4,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GameMonitor extends JavaPlugin {
     Connection conn;
     FileConfiguration config = this.getConfig();
+    public void log(String message) {
+        Logger logger = getLogger();
+        logger.log(Level.INFO, "[GameMonitor] "+message);
+    }
     @Override
     public void onEnable() {
         connectToDatabase();
@@ -35,20 +41,20 @@ public class GameMonitor extends JavaPlugin {
         String DB_NAME = "jdbc:mysql://"+url+":"+port+"/"+database;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            getLogger().info("About to connect to Database!");
+            log("About to connect to Database!");
             conn = DriverManager.getConnection(DB_NAME, username, password);
-            getLogger().info("Successfully connected");
+            log("Successfully connected");
 
-            getLogger().info("About to Create a Statement");
+            log("About to Create a Statement");
         }catch(Exception e){
             e.printStackTrace();
         }
     }
 
     public void updateGameState() {
-        getLogger().info("Preparing to Update Database!");
+        log("Preparing to Update Database!");
         String sql = "INSERT INTO GameStates (Server, State) VALUES ("+getServer().getName()+", "+getGameState()+";";
-        getLogger().info("Trying to input serverState! ServerName = "+getServer().getName()+" & State:"+getGameState());
+        log("Trying to input serverState! ServerName = "+getServer().getName()+" & State:"+getGameState());
         Statement s = null;
         try {
             s.executeUpdate(sql);
