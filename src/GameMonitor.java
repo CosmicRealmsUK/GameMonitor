@@ -18,6 +18,7 @@ public class GameMonitor extends JavaPlugin {
     public void onEnable() {
         connectToDatabase();
         updateGameState();
+        log("Attempted to Start all Processes");
     }
     public void onDisable() {
 
