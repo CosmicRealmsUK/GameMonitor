@@ -46,8 +46,8 @@ public class GameMonitor extends JavaPlugin {
 
     public void updateGameState() {
         getLogger().info("Preparing to Update Database!");
-        String sql = "INSERT INTO GameStates (Server, State) VALUES ("+getServer().getName()+", "+getGameState();
-        getLogger().info("Trying to input serverState!");
+        String sql = "INSERT INTO GameStates (Server, State) VALUES ("+getServer().getName()+", "+getGameState()+";";
+        getLogger().info("Trying to input serverState! ServerName = "+getServer().getName()+" & State:"+getGameState());
         Statement s = null;
         try {
             s.executeUpdate(sql);
