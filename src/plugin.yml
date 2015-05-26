@@ -1,3 +1,4 @@
 name: GameMonitor
+main: uk.cosmicrealms.GameMonitor.GameMonitor
 author: ThomasRed20
 version: 0.1-SNAPSHOT

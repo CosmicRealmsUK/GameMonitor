@@ -1,9 +1,9 @@
+package uk.cosmicrealms.GameMonitor;
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,10 +12,11 @@ public class GameMonitor extends JavaPlugin {
     FileConfiguration config = this.getConfig();
     public void log(String message) {
         Logger logger = getLogger();
-        logger.log(Level.INFO, "[GameMonitor] "+message);
+        logger.log(Level.INFO, "[uk.cosmicrealms.GameMonitor.GameMonitor] "+message);
     }
     @Override
     public void onEnable() {
+        this.saveDefaultConfig();
         connectToDatabase();
         updateGameState();
         log("Attempted to Start all Processes");
@@ -26,13 +27,14 @@ public class GameMonitor extends JavaPlugin {
 
     public String getGameState() {
         String gameStateMode = this.getConfig().getString("Game State Mode");
-        if (gameStateMode .equalsIgnoreCase("MOTD")) {
+        if (gameStateMode.equalsIgnoreCase("MOTD")) {
             String gameState = getServer().getMotd();
             return gameState;
         }else{
             return "Idle";
         }
     }
+
     public void connectToDatabase() {
         String url = config.getString("database.url");
         String username = config.getString("database.username");
@@ -54,11 +56,27 @@ public class GameMonitor extends JavaPlugin {
 
     public void updateGameState() {
         log("Preparing to Update Database!");
-        String sql = "INSERT INTO GameStates (Server, State) VALUES ("+getServer().getName()+", "+getGameState()+";";
-        log("Trying to input serverState! ServerName = "+getServer().getName()+" & State:"+getGameState());
-        Statement s = null;
+        boolean containsServer = false;
         try {
+            PreparedStatement sql = conn
+                    .prepareStatement("SELECT * FROM 'GameStates' WHERE Server=?");
+            sql.setString(1, getServer().getName());
+            ResultSet resultSet = sql.executeQuery();
+            containsServer = resultSet.next();
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+        String sql;
+        if (containsServer) {
+            sql = "INSERT INTO 'GameStates' ('Server', 'State') VALUES ('" + getServer().getName() + "', '" + getGameState() + "')";
+            log("Trying to input serverState! ServerName = " + getServer().getName() + " & State:" + getGameState());
+        }else{
+            sql = "UPDATE 'GameStates' SET 'Server'='"+getServer().getName()+"','State'='"+getGameState()+"' WHERE 'Server'="+getServer().getName();
+        }
+        try {
+            Statement s = conn.createStatement();
             s.executeUpdate(sql);
+
         }catch(Exception e){
             e.printStackTrace();
         }
