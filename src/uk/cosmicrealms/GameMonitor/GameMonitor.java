@@ -72,7 +72,7 @@ public class GameMonitor extends JavaPlugin {
             log("Trying to input serverState! ServerName = " + getServer().getName() + " & State:" + getGameState());
         }else{
             sql = "UPDATE 'GameStates' SET 'Server'='"+getServer().getName()+"','State'='"+getGameState()+"' WHERE 'Server'="+getServer().getName();
-        }
+        } // This should hopefully be 100% Complete now, I will continue tomorrow @CosmicRealms (GitHub on the ServerMachine)
         try {
             Statement s = conn.createStatement();
             s.executeUpdate(sql);
