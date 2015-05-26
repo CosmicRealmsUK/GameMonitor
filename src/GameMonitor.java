@@ -11,6 +11,7 @@ public class GameMonitor extends JavaPlugin {
     @Override
     public void onEnable() {
         connectToDatabase();
+        updateGameState();
     }
     public void onDisable() {
 
