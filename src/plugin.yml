@@ -1,3 +1,11 @@
 name: GameMonitor
+main: uk.cosmicrealms.GameMonitor.GameMonitor
 author: ThomasRed20
 version: 0.1-SNAPSHOT
+commands:
+ setMOTD:
+  description: Use this to set the MOTD
+  usage: /setMOTD <MOTD>
+ saveState:
+  description: Manually Calls the Save State
+  usage: /saveState

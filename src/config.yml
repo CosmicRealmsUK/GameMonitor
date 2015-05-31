@@ -4,3 +4,6 @@ database:
     username: CosmicRealms
     password: null
     port: 3006
+Game State Mode: MOTD
+serverName: TestServer
+manualMOTD: false
