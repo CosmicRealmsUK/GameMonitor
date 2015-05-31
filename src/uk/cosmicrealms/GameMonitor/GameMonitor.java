@@ -1,18 +1,24 @@
 package uk.cosmicrealms.GameMonitor;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class GameMonitor extends JavaPlugin {
+public class GameMonitor extends JavaPlugin implements Listener{
+    String serverMOTD = "";
     Connection conn;
     FileConfiguration config = this.getConfig();
     public void log(String message) {
         Logger logger = getLogger();
-        logger.log(Level.INFO, "[uk.cosmicrealms.GameMonitor.GameMonitor] "+message);
+        logger.log(Level.INFO, message);
     }
     @Override
     public void onEnable() {
@@ -20,6 +26,7 @@ public class GameMonitor extends JavaPlugin {
         connectToDatabase();
         updateGameState();
         log("Attempted to Start all Processes");
+        getServer().getPluginManager().registerEvents(this, this);
     }
     public void onDisable() {
 
@@ -34,7 +41,9 @@ public class GameMonitor extends JavaPlugin {
             return "Idle";
         }
     }
-
+    public String getServerName() {
+        return getConfig().getString("serverName");
+    }
     public void connectToDatabase() {
         String url = config.getString("database.url");
         String username = config.getString("database.username");
@@ -59,26 +68,63 @@ public class GameMonitor extends JavaPlugin {
         boolean containsServer = false;
         try {
             PreparedStatement sql = conn
-                    .prepareStatement("SELECT * FROM 'GameStates' WHERE Server=?");
-            sql.setString(1, getServer().getName());
+                    .prepareStatement("SELECT * FROM `GameStates` WHERE Server=?");
+            sql.setString(1, getServerName());
             ResultSet resultSet = sql.executeQuery();
             containsServer = resultSet.next();
+            sql.close();
+            resultSet.close();
         }catch(Exception e) {
             e.printStackTrace();
         }
-        String sql;
-        if (containsServer) {
-            sql = "INSERT INTO 'GameStates' ('Server', 'State') VALUES ('" + getServer().getName() + "', '" + getGameState() + "')";
-            log("Trying to input serverState! ServerName = " + getServer().getName() + " & State:" + getGameState());
-        }else{
-            sql = "UPDATE 'GameStates' SET 'Server'='"+getServer().getName()+"','State'='"+getGameState()+"' WHERE 'Server'="+getServer().getName();
-        } // This should hopefully be 100% Complete now, I will continue tomorrow @CosmicRealms (GitHub on the ServerMachine)
-        try {
-            Statement s = conn.createStatement();
-            s.executeUpdate(sql);
 
+        try {
+            if (containsServer) {
+                PreparedStatement stateUpdate = conn.prepareStatement("UPDATE `GameStates` SET State=? WHERE `Server`=?");
+                stateUpdate.setString(1, getGameState());
+                stateUpdate.setString(2, getServerName());
+                stateUpdate.executeUpdate();
+
+                stateUpdate.close();
+
+            } else {
+                PreparedStatement newServer = conn.prepareStatement("INSERT INTO `GameStates` values(?,?)");
+                newServer.setString(1,getServerName());
+                newServer.setString(2,getGameState());
+                newServer.execute();
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void setMOTD(String motd) {
+        serverMOTD = motd;
+    }
+
+    @EventHandler
+    public void onServerListPing(ServerListPingEvent event) {
+        if (getConfig().getBoolean("ManualMOTD") && serverMOTD != "")
+            event.setMotd(serverMOTD);
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (cmd.getName().equalsIgnoreCase("setMOTD")) {
+            String newMOTD = "";
+            for(String arg : args) {
+                newMOTD = newMOTD+arg;
+            }
+            sender.sendMessage("[GameMonitor] Set the MOTD to: "+ newMOTD);
+            setMOTD(newMOTD);
+            return true;
+        }else if(cmd.getName().equalsIgnoreCase("saveState")) {
+            updateGameState();
+            return true;
+        }else if(cmd.getName().equalsIgnoreCase("getInfo")) {
+            sender.sendMessage("[GameMonitor] MOTD: "+ getServer().getMotd());
+            sender.sendMessage("[GameMonitor] Server: "+ getServerName());
+        }
+        return false;
     }
 }
