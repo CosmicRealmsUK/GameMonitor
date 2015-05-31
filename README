@@ -1,0 +1,7 @@
+This is the new Monitoring System for CosmicRealms,
+This Plugin will Monitor all Connected Instances to the Database
+The things that need to be completed currently are:
+    - Bungee Monitoring
+    - Bukkit Monitoring
+    - Connection to the Database (Preferably MySQL)
+    - Connection Monitoring (Make sure all Servers are alive & connected)

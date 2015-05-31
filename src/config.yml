@@ -1,0 +1,6 @@
+database:
+    url: localhost
+    database: CR_GameMonitor
+    username: CosmicRealms
+    password: null
+    port: 3006
