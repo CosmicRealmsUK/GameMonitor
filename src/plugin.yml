@@ -9,3 +9,6 @@ commands:
  saveState:
   description: Manually Calls the Save State
   usage: /saveState
+ connectToDatabase:
+  description: Manually Reconnects to the Database
+  usage: /connectToDatabase

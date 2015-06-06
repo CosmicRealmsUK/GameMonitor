@@ -5,5 +5,5 @@ database:
     password: null
     port: 3006
 Game State Mode: MOTD
-serverName: TestServer
+serverName: LocalTestServer
 manualMOTD: false

@@ -52,13 +52,14 @@ public class GameMonitor extends JavaPlugin implements Listener{
         String database = config.getString("database.database");
         String DB_NAME = "jdbc:mysql://"+url+":"+port+"/"+database;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
             log("About to connect to Database!");
-            conn = DriverManager.getConnection(DB_NAME, username, password);
+            //conn = DriverManager.getConnection(DB_NAME, username, password);
+            conn = DriverManager.getConnection("jdbc:mysql://panel.cosmicrealms.uk:3306/CR_GameMonitor", "TestUserAccount", "hFVwCJYNFTduK9zC");
             log("Successfully connected");
 
             log("About to Create a Statement");
         }catch(Exception e){
+            log("Failed to Connect to the Database!");
             e.printStackTrace();
         }
     }
@@ -120,10 +121,14 @@ public class GameMonitor extends JavaPlugin implements Listener{
             return true;
         }else if(cmd.getName().equalsIgnoreCase("saveState")) {
             updateGameState();
+            sender.sendMessage("[GameMonitor] Attempting to Update the State on the Database");
             return true;
         }else if(cmd.getName().equalsIgnoreCase("getInfo")) {
             sender.sendMessage("[GameMonitor] MOTD: "+ getServer().getMotd());
             sender.sendMessage("[GameMonitor] Server: "+ getServerName());
+        }else if(cmd.getName().equalsIgnoreCase("connectToDatabase")) {
+            sender.sendMessage("Attempting to connect to the Database");
+            connectToDatabase();
         }
         return false;
     }
