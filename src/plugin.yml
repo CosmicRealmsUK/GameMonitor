@@ -12,3 +12,9 @@ commands:
  connectToDatabase:
   description: Manually Reconnects to the Database
   usage: /connectToDatabase
+ getInfo:
+  description: Gets information about current server
+ updateServerList:
+  description: Updates the ServerList
+ join:
+  description: Test new Join Command
