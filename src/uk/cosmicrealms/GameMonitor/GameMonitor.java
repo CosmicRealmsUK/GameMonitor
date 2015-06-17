@@ -445,9 +445,15 @@ public final class GameMonitor extends JavaPlugin implements Listener, PluginMes
                             String[] newRouteList = newRoute.split("#");
                             connectTo = newRouteList[0];
                             StringBuilder reformedRoute = new StringBuilder();
+                            Integer reformedRouteList = 0;
                             for (String s : newRouteList) {
+                                reformedRouteList = reformedRouteList + 1;
                                 if (!(s.equalsIgnoreCase(newRouteList[0]))) {
-                                    reformedRoute.append(s);
+                                    if(reformedRouteList == newRouteList.length) {
+                                        reformedRoute.append(s);
+                                    }else{
+                                        reformedRoute.append(s + "#");
+                                    }
                                 }
 
                             }
